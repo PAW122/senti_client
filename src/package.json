@@ -2,7 +2,7 @@
   "name": "senti_client",
   "version": "0.0.1",
   "description": "discord js client",
-  "main": "main.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
