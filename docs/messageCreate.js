@@ -42,6 +42,8 @@ async function main() {
 
     senti.on("messageCreate", (message,obj) => {
         console.log(`messageCreate: ${message.content}`)
+
+        console.log(`message object: ${obj}`)
     })
 
     senti.connect(bot_token)

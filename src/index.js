@@ -1,4 +1,5 @@
 module.exports = {
     SentiClient: require('./main'),
-    Collection: require('./collections')
-  };
+    Collection: require('./collections'),
+    EmbedMessage: require("./embed")
+};

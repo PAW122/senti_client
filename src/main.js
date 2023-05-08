@@ -1,9 +1,10 @@
 const EventEmitter = require("events");
 const axios = require("axios");
-const { DISCORD_API_URL, ws_gateway, ping_interval } = require("./config/config.json");
+const { DISCORD_API_URL, ws_gateway } = require("./config/config.json");
 const send = require("./handlers/send/send");
 const WebSocket = require('ws');
 const Collection = require("./collections");
+const  sendWithEmbed = require("./handlers/send_embed")
 
 
 let instance = null;
@@ -85,6 +86,10 @@ class SentiClient extends EventEmitter {
 
     async send(channel, message) {
         send(this.token, channel, message);
+    }
+
+    async sendEmbed(channel_id, embed) {
+        sendWithEmbed(this.token, channel_id, embed)
     }
 
     async getGateway() {

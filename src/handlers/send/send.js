@@ -28,7 +28,7 @@ async function send(token, channelId, message) {
             }
         );
 
-        console.log(`Message sent: ${response.data.content}`);
+        //console.log(`Message sent: ${response.data.content}`);
     } catch (error) {
         console.error(error);
     }

@@ -1,5 +1,4 @@
 {
     "DISCORD_API_URL": "https://discord.com/api/v9",
-    "ws_gateway": "?v=9&encoding=json",
-    "ping_interval": 10000
+    "ws_gateway": "?v=9&encoding=json"
 }

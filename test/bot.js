@@ -1,4 +1,4 @@
-const { SentiClient, Collection } = require("senti_client");
+const { SentiClient, Collection, EmbedMessage } = require("senti_client");
 const handler = require("./handlers/handler")
 const msg_handler = require("./handlers/msg_handler")
 
@@ -17,11 +17,33 @@ async function main() {
   senti.on("messageCreate", (message, obj) => {
     console.log(message.content)
 
-    msg_handler(message,senti,prefix)
+    msg_handler(message, senti, prefix)
   })
 
   senti.connect(bot_token);
 
+  //wysyłanie testowego embeda:
+  // tworzenie obiektu EmbedMessage
+  const embed = new EmbedMessage()
+    .setTitle("Tytuł")
+    .setColor(0xff0000)
+    .setDescription("Opis")
+    .addField("Pole 1", "Wartość 1")
+
+  // wysyłanie wiadomości z embedem za pomocą funkcji sendWithEmbed
+  senti.sendEmbed("745768777022701648", embed.getEmbed());
+
+  console.log(embed.getEmbed())
+  console.log("_______________________________________________________________________________________________")
 }
 
 main();
+
+
+// {
+//   title: 'Tytuł',
+//   description: 'Opis',
+//   color: '',
+//   fields: [ { name: 'Pole 1', value: 'Wartość 1', inline: false } ],
+//   footer: { text: '', icon_url: '' }
+// }
