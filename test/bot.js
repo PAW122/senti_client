@@ -22,19 +22,20 @@ async function main() {
 
   senti.connect(bot_token);
 
-  //wysyłanie testowego embeda:
-  // tworzenie obiektu EmbedMessage
-  const embed = new EmbedMessage()
-    .setTitle("Tytuł")
-    .setColor(0xff0000)
-    .setDescription("Opis")
-    .addField("Pole 1", "Wartość 1")
+  // //wysyłanie testowego embeda:
+  // // tworzenie obiektu EmbedMessage
+  // const embed = new EmbedMessage()
+  //   .setTitle("Tytuł")
+  //   .setColor(0xff0000)
+  //   .setDescription("Opis")
+  //   .addField("Pole 1", "Wartość 1")
 
-  // wysyłanie wiadomości z embedem za pomocą funkcji sendWithEmbed
-  senti.sendEmbed("745768777022701648", embed.getEmbed());
+  // // wysyłanie wiadomości z embedem za pomocą funkcji sendWithEmbed
+  // senti.sendEmbed("745768777022701648", embed.getEmbed());
 
-  console.log(embed.getEmbed())
-  console.log("_______________________________________________________________________________________________")
+  // console.log(embed.getEmbed())
+  // console.log("_______________________________________________________________________________________________")
+  
 }
 
 main();

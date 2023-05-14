@@ -1,8 +1,7 @@
 const { DISCORD_API_URL } = require("../../config/config.json")
+const sendApi = require("../../modules/APILimiter")
 
-const axios = require("axios");
-
-async function send(token, channelId, message) {
+async function send(token, channelId, message, reaction) {
     const url = `${DISCORD_API_URL}/channels/${channelId}/messages`;
 
     if (!channelId || isNaN(channelId)) {
@@ -18,17 +17,23 @@ async function send(token, channelId, message) {
     }
 
     try {
-        const response = await axios.post(
-            url,
-            { content: message },
-            {
-                headers: {
-                    Authorization: `Bot ${token}`,
-                },
-            }
-        );
+        let data = {
+            content: message
+        }
+        const response = await sendApi(token,url, data);
 
-        //console.log(`Message sent: ${response.data.content}`);
+        //add reaction:
+        if (reaction) {
+            const messageId = response.data.id;
+            const reactionUrl = `${DISCORD_API_URL}/channels/${channelId}/messages/${messageId}/reactions/${encodeURIComponent(reaction)}/@me`;
+            data = {}
+            console.log(`sendjs add reaction data: ${data}, reactionUrl: ${reactionUrl}, messageId: ${messageId}, reaction: ${reaction}`)
+            let options = {
+                type: "put"
+            }
+            await sendApi(token,reactionUrl,data,options);
+        }
+
     } catch (error) {
         console.error(error);
     }
