@@ -10,7 +10,7 @@ module.exports = (message,client,prefix) => {
         try{
             command.execute(message, args, client);
         } catch(err) {
-            console.log(`podczas wykonywania komendy wystąpił error: ${err}`)
+            console.log(`an error occurred while executing the command: ${err}`)
         }
     }
 }

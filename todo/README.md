@@ -1,5 +1,9 @@
 zrobić kolorki do embedów jak w discord.js
 
+# todo
+1. spróbować zrobić wbudowany system db
+
+
 kopia z dc.js:
 
 

@@ -27,12 +27,14 @@ async function send(token, channelId, message, reaction) {
             const messageId = response.data.id;
             const reactionUrl = `${DISCORD_API_URL}/channels/${channelId}/messages/${messageId}/reactions/${encodeURIComponent(reaction)}/@me`;
             data = {}
-            console.log(`sendjs add reaction data: ${data}, reactionUrl: ${reactionUrl}, messageId: ${messageId}, reaction: ${reaction}`)
+
             let options = {
                 type: "put"
             }
-            await sendApi(token,reactionUrl,data,options);
+            var response2 = await sendApi(token,reactionUrl,data,options);
         }
+
+        return response, response2 || null
 
     } catch (error) {
         console.error(error);

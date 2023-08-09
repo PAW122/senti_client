@@ -1,26 +1,66 @@
 const axios = require('axios');
 
-const promises = [];
+// Zmienna do śledzenia czasu ostatniego żądania
+let lastRequestTime = 0;
 
-function RequestManager() {
-    const promise = new Promise((resolve, reject) => {
-        // Przetwarzanie żądania
-        // ...
+async function RequestManager(obj) {
+    try {
+        // Sprawdź, czy upłynął odpowiedni czas od ostatniego żądania
+        const currentTime = Date.now();
+        const timeElapsed = currentTime - lastRequestTime;
+        const timeToWait = 1000 / 3; // 1000 ms / 3 żądania = 333 ms na żądanie
+        if (timeElapsed < timeToWait) {
+            // Jeśli upłynął mniej niż wymagany czas, odczekaj resztę
+            const timeRemaining = timeToWait - timeElapsed;
+            await new Promise(resolve => setTimeout(resolve, timeRemaining));
+        }
 
-        // Zwracanie wyniku za pomocą Promise.resolve()
-        resolve(result);
-    });
+        if (obj.options && obj.options.type == "delete") {
+            response = await axios.delete(obj.url,
+                {
+                    headers: {
+                        Authorization: `Bot ${obj.token}`,
+                    }
+                }
+            );
 
-    // Dodawanie Promise'a do listy
-    promises.push(promise);
+        } else if (obj.options && obj.options.type == "put") {
+            response = await axios.put(obj.url,
+                obj.data || null,
+                {
+                    headers: {
+                        Authorization: `Bot ${obj.token}`,
+                    }
+                }
+            );
 
-    // Zwracanie Promise'a
-    return promise;
+        } else {
+            response = await axios.post(obj.url,
+                obj.data || null,
+                {
+                    headers: {
+                        Authorization: `Bot ${obj.token}`,
+                    }
+                }
+            );
+        }
+
+        // Zaktualizuj czas ostatniego żądania
+        lastRequestTime = Date.now();
+        return response;
+
+    } catch (err) {
+        if (err.response && err.response.status === 405) {
+            queue.shift();
+            console.log("Request failed with status code 405 -- Method Not Allowed")
+        } else if(err.response && err.response.status === 429) {
+            console.log("Request failed with status code 429 -- Rate Limit\n to many requests")
+        }
+        console.log("APILimiter error: " + err)
+    }
 }
 
-
 async function sendApi(token, url, data, options) {
-
     if (!token || !url) {
         throw new Error("send API error\n undefind variable")
     }
@@ -32,32 +72,24 @@ async function sendApi(token, url, data, options) {
         options: options || null
     }
 
-    queue.push(obj)
-    RequestManager().then(result => {
-        return result
-    }).catch(err => {
+    try {
+        const res = await RequestManager(obj)
+        return res
+    } catch (err) {
         return err
-    })
+    }
 }
 
 module.exports = sendApi;
 
-
 /*
-    kolejka wysyłania zapytań do api w celu uniknęcia rate limit
+na podstawie tego kodu zrobić syf który będzie po kolei wysyłał rządania z kolejki
 
-    dodać coś w stypu priorytetów -> w pocjach dodać object -> {
-        priority_lvl: low/high
-    }
-    jeżeli priorytet jest wysoki zadanie jest ustawiane w kolejce na samej górze
+this.heartbeatInterval = setInterval(() => {
+                    if (ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ op: 1, d: null }));
+                    }
+                }, 30000);
 
-    ! sprawdzić czy toggleValueWithDelay() jest w takim samym systemie czasowym co funkcja - api res chyba jest podana w minutach albo sekundach
 
-    sprawdzić w dc docs ile zapytań może być aktywnych w tym samym czasie i zmidyfikować kolejkę jeżeli może być więcej niżjedno
-
-    sprawdzic czy można wysłać zapytanie do api jaki jest rate limit dla danedo tokena, automatycznie ustawić taki limit na kolejce
-*/
-
-/*
-    dodać jakąś opcję aby user mógł sprawdzić ile zapytań do api wykonał
 */

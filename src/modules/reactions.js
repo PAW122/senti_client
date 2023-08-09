@@ -1,4 +1,4 @@
-const { DISCORD_API_URL, ws_gateway } = require("../config/config.json")
+const { DISCORD_API_URL } = require("../config/config.json")
 const sendApi = require("../modules/APILimiter")
 
 /**
@@ -10,9 +10,9 @@ const sendApi = require("../modules/APILimiter")
  * @returns {Promise} - Promise that resolves with the response data from the API
  */
 async function addReaction(token, channelId, messageId, reaction) {
-  if (!channelId) throw new Error("channel id not specified")
-  if (!messageId) throw new Error("messageId not specified")
-  if (!reaction) throw new Error("reaction not specified")
+  if (!channelId) throw new Error("addReaction channel_id not specified")
+  if (!messageId) throw new Error("addReaction messageId not specified")
+  if (!reaction) throw new Error("addReaction reaction not specified")
   try {
     let url = `${DISCORD_API_URL}/channels/${channelId}/messages/${messageId}/reactions/${encodeURIComponent(reaction)}/@me`
     let data = {}
@@ -20,11 +20,12 @@ async function addReaction(token, channelId, messageId, reaction) {
       type: "put"
     }
     const response = await sendApi(token, url, data, options)
-    if (response.status == 204) console.log(response.statusText)
+    if (response.status && response.status == 204) console.log(response.statusText)
     return response.data;
 
   } catch (error) {
-    console.error(`Error adding reaction: ${error}`);
+    console.error(`> an error occurred while adding the reaction: ${error}`);
+    return error
   }
 }
 
