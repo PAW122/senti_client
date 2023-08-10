@@ -33,8 +33,9 @@ async function RequestManager(obj) {
                     }
                 }
             );
-
         } else {
+            console.log("else")
+            console.log(obj)
             response = await axios.post(obj.url,
                 obj.data || null,
                 {

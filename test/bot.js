@@ -22,8 +22,40 @@ async function main() {
     // console.log(obj)
 
     if(message.content == "delet") {
+                          //channel_id          message_id
       senti.MESSAGE_DELETE("745768777022701648","1138942993601155103")
     }
+
+    if(message.content == "edit") {
+                            //channel_id          message_id              new message content
+      senti.MESSAGE_UPDATE("745768777022701648", "1139310802462064660", "3wiadomość zedytowana")
+    }
+
+    if(message.content == "bulk") {
+                               //channel_id               list of messages id to delete
+      senti.MESSAGE_DELETE_BULK("745768777022701648", ["1139314228579291136","1139314230131175524"])
+    }
+
+    if(message.content == "reaction+") {
+                               //channel_id            message_id           reaction
+      senti.MESSAGE_REACTION_ADD("745768777022701648","1139315421133152408","✅")
+    }
+
+    if(message.content == "reaction-") {
+                                //channel_id            message_id           reaction
+      senti.MESSAGE_REACTION_REMOVE("745768777022701648","1139315421133152408","✅")
+    }
+
+    if(message.content == "reaction--") {
+                                  //channel_id            message_id
+      senti.MESSAGE_REACTION_REMOVE_ALL("745768777022701648","1139315421133152408")
+    }
+
+    if(message.content == "reaction-?") {
+                                    //channel_id            message_id                  emoji
+      senti.MESSAGE_REACTION_REMOVE_EMOJI("745768777022701648", "1139315421133152408", "✅")
+    }
+    
   })
 
   //recive Events

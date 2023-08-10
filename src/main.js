@@ -35,7 +35,7 @@ class SentiClient extends EventEmitter {
      * @throws {Error} - Return error if needed
     */
     async connect(token) {
-        if(!token) throw new Error("connect error:\n token is undefind")
+        if (!token) throw new Error("connect error:\n token is undefind")
         if (!this.connected) {
             this.token = token;
             const response = await axios.get(`${DISCORD_API_URL}/users/@me`, {
@@ -179,8 +179,8 @@ class SentiClient extends EventEmitter {
      * @throws {Error} If reaction is missing.
     */
     async sendEmbed(channel_id, embed, reaction) {
-        if(!channel_id) throw new Error("> sendEmbed error\n: channel id is undefind")
-        if(!embed) throw new Error("> sendEmbed error\n: embed is undefind")
+        if (!channel_id) throw new Error("> sendEmbed error\n: channel id is undefind")
+        if (!embed) throw new Error("> sendEmbed error\n: embed is undefind")
 
         return sendWithEmbed_api(this.token, channel_id, embed, reaction)
     }
@@ -195,9 +195,9 @@ class SentiClient extends EventEmitter {
      * @throws {Error} - return error if somethink is missing.
     */
     async addReaction(channel_id, message_id, reaction) {
-        if(!channel_id) throw new Error("> addReaction error\n: channel id is undefind")
-        if(!message_id) throw new Error("> addReaction error\n: message id is undefind")
-        if(!reaction) throw new Error("> addReaction error:\n reaction is undefind")
+        if (!channel_id) throw new Error("> addReaction error\n: channel id is undefind")
+        if (!message_id) throw new Error("> addReaction error\n: message id is undefind")
+        if (!reaction) throw new Error("> addReaction error:\n reaction is undefind")
         return addReaction_api(this.token, channel_id, message_id, reaction)
     }
 
@@ -209,16 +209,208 @@ class SentiClient extends EventEmitter {
      * @throws {Error} If channel_id or message_id is missing.
     */
     async MESSAGE_DELETE(channel_id, message_id) {
-        if(!channel_id) throw new Error("> MESSAGE_DELETE error\n: channel id is undefind")
-        if(!message_id) throw new Error("> MESSAGE_DELETE error\n: message id is undefind")
+        if (!channel_id) throw new Error("> MESSAGE_DELETE error\n: channel id is undefind")
+        if (!message_id) throw new Error("> MESSAGE_DELETE error\n: message id is undefind")
 
         let options = {
             type: "delete"
         }
         let url = `${DISCORD_API_URL}/channels/${channel_id}/messages/${message_id}`
-        const res = req_api(this.token,url,options )
+        const res = req_api(this.token, url, options)
         return res
     }
+
+    /**
+     * Aktualizuje istniejącą wiadomość na danym kanale.
+     * @param {string} channel_id - ID kanału, na którym znajduje się wiadomość.
+     * @param {string} message_id - ID wiadomości do zaktualizowania.
+     * @param {string} new_content - Nowa treść wiadomości.
+     * @returns {Promise<Object>} Obiekt reprezentujący odpowiedź z API Discorda.
+     * @throws {Error} Jeśli brakuje channel_id, message_id lub new_content.
+     */
+    async MESSAGE_UPDATE(channel_id, message_id, new_content) {
+        if (!channel_id) throw new Error("> MESSAGE_UPDATE error\n: channel id is undefind");
+        if (!message_id) throw new Error("> MESSAGE_UPDATE error\n: message id is undefind");
+        if (!new_content) throw new Error("> MESSAGE_UPDATE error\n: new content is undefind");
+        // TODO: przenieść do APILimiter
+        let options = {
+            method: "patch",
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                "Content-Type": "application/json"
+            },
+            data: {
+                content: new_content
+            }
+        };
+        let url = `${DISCORD_API_URL}/channels/${channel_id}/messages/${message_id}`;
+
+        try {
+            const response = await axios(url, options);
+            return response.data;
+        } catch (error) {
+            if (error.code == 50005) {
+                console.log("Cannot edit a message authored by another user")
+            }
+            console.error("An error occurred while updating the message:", error.message);
+            return error;
+        }
+    }
+
+    /**
+    * Usuwa wiele wiadomości na danym kanale.
+    * @param {string} channel_id - ID kanału, na którym znajdują się wiadomości.
+    * @param {Array<string>} message_ids - Tablica ID wiadomości do usunięcia.
+    * @returns {Promise<Object>} Obiekt reprezentujący odpowiedź z API Discorda.
+    * @throws {Error} Jeśli brakuje channel_id lub message_ids.
+    */
+    async MESSAGE_DELETE_BULK(channel_id, message_ids) {
+        if (!channel_id) throw new Error("> MESSAGE_DELETE_BULK error\n: channel id is undefind");
+        if (!message_ids || message_ids.length === 0) throw new Error("> MESSAGE_DELETE_BULK error\n: message ids are missing");
+        // TODO: przenieść do APILimiter
+        let options = {
+            method: "post",
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                "Content-Type": "application/json"
+            },
+            data: {
+                messages: message_ids
+            }
+        };
+        let url = `${DISCORD_API_URL}/channels/${channel_id}/messages/bulk-delete`;
+
+        try {
+            const response = await axios(url, options);
+            return response.data;
+        } catch (error) {
+            console.error("An error occurred while deleting messages:", error.message);
+            throw error;
+        }
+    }
+
+    /**
+ * Obsługuje dodawanie reakcji do wiadomości.
+ * @param {string} channel_id - ID kanału, w którym znajduje się wiadomość.
+ * @param {string} message_id - ID wiadomości, do której dodawana jest reakcja.
+ * @param {string} emoji - Emoji, którą chcesz dodać jako reakcję (np. "👍").
+ * @returns {Promise<Object>} Obiekt reprezentujący odpowiedź z API Discorda.
+ * @throws {Error} Jeśli brakuje channel_id, message_id lub emoji.
+ */
+    async MESSAGE_REACTION_ADD(channel_id, message_id, emoji) {
+        if (!channel_id) throw new Error("> MESSAGE_REACTION_ADD error\n: channel id is undefind");
+        if (!message_id) throw new Error("> MESSAGE_REACTION_ADD error\n: message id is undefind");
+        if (!emoji) throw new Error("> MESSAGE_REACTION_ADD error\n: emoji is undefind");
+        // TODO: przenieść do APILimiter
+        let options = {
+            method: "put",
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                "Content-Type": "application/json"
+            }
+        };
+        let url = `${DISCORD_API_URL}/channels/${channel_id}/messages/${message_id}/reactions/${encodeURIComponent(emoji)}/@me`;
+
+        try {
+            const response = await axios(url, options);
+            return response.data;
+        } catch (error) {
+            console.error("An error occurred while adding reaction:", error.message);
+            throw error;
+        }
+    }
+
+    /**
+ * Obsługuje usuwanie reakcji z wiadomości.
+ * @param {string} channel_id - ID kanału, w którym znajduje się wiadomość.
+ * @param {string} message_id - ID wiadomości, z której usuwana jest reakcja.
+ * @param {string} emoji - Emoji, którą chcesz usunąć jako reakcję (np. "👍").
+ * @returns {Promise<Object>} Obiekt reprezentujący odpowiedź z API Discorda.
+ * @throws {Error} Jeśli brakuje channel_id, message_id lub emoji.
+ */
+    async MESSAGE_REACTION_REMOVE(channel_id, message_id, emoji) {
+        if (!channel_id) throw new Error("> MESSAGE_REACTION_REMOVE error\n: channel id is undefind");
+        if (!message_id) throw new Error("> MESSAGE_REACTION_REMOVE error\n: message id is undefind");
+        if (!emoji) throw new Error("> MESSAGE_REACTION_REMOVE error\n: emoji is undefind");
+
+        let options = {
+            method: "delete",
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                "Content-Type": "application/json"
+            }
+        };
+        let url = `${DISCORD_API_URL}/channels/${channel_id}/messages/${message_id}/reactions/${encodeURIComponent(emoji)}/@me`;
+
+        try {
+            const response = await axios(url, options);
+            return response.data;
+        } catch (error) {
+            console.error("An error occurred while removing reaction:", error.message);
+            throw error;
+        }
+    }
+
+    /**
+ * Usuwa wszystkie reakcje z danej wiadomości.
+ * @param {string} channel_id - ID kanału, w którym znajduje się wiadomość.
+ * @param {string} message_id - ID wiadomości, z której usuwane są reakcje.
+ * @returns {Promise<Object>} Obiekt reprezentujący odpowiedź z API Discorda.
+ * @throws {Error} Jeśli brakuje channel_id lub message_id.
+ */
+    async MESSAGE_REACTION_REMOVE_ALL(channel_id, message_id) {
+        if (!channel_id) throw new Error("> MESSAGE_REACTION_REMOVE_ALL error\n: channel id is undefind");
+        if (!message_id) throw new Error("> MESSAGE_REACTION_REMOVE_ALL error\n: message id is undefind");
+
+        let options = {
+            method: "delete",
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                "Content-Type": "application/json"
+            }
+        };
+        let url = `${DISCORD_API_URL}/channels/${channel_id}/messages/${message_id}/reactions`;
+
+        try {
+            const response = await axios(url, options);
+            return response.data;
+        } catch (error) {
+            console.error("An error occurred while removing all reactions:", error.message);
+            throw error;
+        }
+    }
+
+    /**
+ * Usuwa wszystkie reakcje z danej wiadomości, dla konkretnej emoji.
+ * @param {string} channel_id - ID kanału, w którym znajduje się wiadomość.
+ * @param {string} message_id - ID wiadomości, z której usuwane są reakcje.
+ * @param {string} emoji - Emoji, dla której chcesz usunąć reakcje (np. "👍").
+ * @returns {Promise<Object>} Obiekt reprezentujący odpowiedź z API Discorda.
+ * @throws {Error} Jeśli brakuje channel_id, message_id lub emoji.
+ */
+    async MESSAGE_REACTION_REMOVE_EMOJI(channel_id, message_id, emoji) {
+        if (!channel_id) throw new Error("> MESSAGE_REACTION_REMOVE_EMOJI error\n: channel id is undefind");
+        if (!message_id) throw new Error("> MESSAGE_REACTION_REMOVE_EMOJI error\n: message id is undefind");
+        if (!emoji) throw new Error("> MESSAGE_REACTION_REMOVE_EMOJI error\n: emoji is undefind");
+
+        let options = {
+            method: "delete",
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                "Content-Type": "application/json"
+            }
+        };
+        let url = `${DISCORD_API_URL}/channels/${channel_id}/messages/${message_id}/reactions/${encodeURIComponent(emoji)}`;
+
+        try {
+            const response = await axios(url, options);
+            return response.data;
+        } catch (error) {
+            console.error("An error occurred while removing reactions for emoji:", error.message);
+            throw error;
+        }
+    }
+
 
     async getGateway() {
         const response = await axios.get(`${DISCORD_API_URL}/gateway/bot`, {
