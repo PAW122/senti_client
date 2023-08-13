@@ -7,6 +7,7 @@ const Collection = require("./collections");
 const sendWithEmbed_api = require("./handlers/send_embed")
 const addReaction_api = require("./modules/reactions")
 const req_api = require("./modules/APILimiter")
+const { custom_request } = require("./modules/ReqApi")
 
 let instance = null;
 class SentiClient extends EventEmitter {
@@ -89,7 +90,9 @@ class SentiClient extends EventEmitter {
                 'INTEGRATION_CREATE': (data) => this.emit("INTEGRATION_CREATE", data),
                 'INTEGRATION_UPDATE': (data) => this.emit("INTEGRATION_UPDATE", data),
                 'INTEGRATION_DELETE': (data) => this.emit("INTEGRATION_DELETE", data),
-                'INTERACTION_CREATE': (data) => this.emit("INTERACTION_CREATE", data),
+                'INTERACTION_CREATE': (data) => {
+                    this.emit("INTERACTION_CREATE", data)
+                },
                 'INVITE_CREATE': (data) => this.emit("INVITE_CREATE", data),
                 'INVITE_DELETE': (data) => this.emit("INVITE_DELETE", data),
                 'MESSAGE_CREATE': (data) => {
@@ -244,9 +247,8 @@ class SentiClient extends EventEmitter {
             }
         };
         let url = `${DISCORD_API_URL}/channels/${channel_id}/messages/${message_id}`;
-
         try {
-            const response = await axios(url, options);
+            const response = await custom_request(url, options);
             return response.data;
         } catch (error) {
             if (error.code == 50005) {
@@ -281,7 +283,7 @@ class SentiClient extends EventEmitter {
         let url = `${DISCORD_API_URL}/channels/${channel_id}/messages/bulk-delete`;
 
         try {
-            const response = await axios(url, options);
+            const response = await custom_request(url, options);
             return response.data;
         } catch (error) {
             console.error("An error occurred while deleting messages:", error.message);
@@ -312,7 +314,7 @@ class SentiClient extends EventEmitter {
         let url = `${DISCORD_API_URL}/channels/${channel_id}/messages/${message_id}/reactions/${encodeURIComponent(emoji)}/@me`;
 
         try {
-            const response = await axios(url, options);
+            const response = await custom_request(url, options);
             return response.data;
         } catch (error) {
             console.error("An error occurred while adding reaction:", error.message);
@@ -343,7 +345,7 @@ class SentiClient extends EventEmitter {
         let url = `${DISCORD_API_URL}/channels/${channel_id}/messages/${message_id}/reactions/${encodeURIComponent(emoji)}/@me`;
 
         try {
-            const response = await axios(url, options);
+            const response = await custom_request(url, options);
             return response.data;
         } catch (error) {
             console.error("An error occurred while removing reaction:", error.message);
@@ -372,7 +374,7 @@ class SentiClient extends EventEmitter {
         let url = `${DISCORD_API_URL}/channels/${channel_id}/messages/${message_id}/reactions`;
 
         try {
-            const response = await axios(url, options);
+            const response = await custom_request(url, options);
             return response.data;
         } catch (error) {
             console.error("An error occurred while removing all reactions:", error.message);
@@ -403,7 +405,7 @@ class SentiClient extends EventEmitter {
         let url = `${DISCORD_API_URL}/channels/${channel_id}/messages/${message_id}/reactions/${encodeURIComponent(emoji)}`;
 
         try {
-            const response = await axios(url, options);
+            const response = await custom_request(url, options);
             return response.data;
         } catch (error) {
             console.error("An error occurred while removing reactions for emoji:", error.message);
@@ -411,6 +413,391 @@ class SentiClient extends EventEmitter {
         }
     }
 
+    /**
+ * Wysyła sygnał, że użytkownik zaczyna pisać na danym kanale przez kilka sekund.
+ * @param {string} channel_id - ID kanału, na którym użytkownik zaczyna pisać.
+ * @returns {Promise<Object>} Obiekt reprezentujący odpowiedź z API Discorda.
+ * @throws {Error} Jeśli brakuje channel_id.
+ */
+    async TYPING_START(channel_id) {
+        if (!channel_id) throw new Error("> TYPING_START error\n: channel id is undefind");
+
+        let options = {
+            method: "post",
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                "Content-Type": "application/json"
+            }
+        };
+        let url = `${DISCORD_API_URL}/channels/${channel_id}/typing`;
+
+        try {
+            const response = await custom_request(url, options);
+            return response.data;
+        } catch (error) {
+            console.error("An error occurred while sending typing indicator:", error.message);
+            throw error;
+        }
+    }
+
+    /**
+     * Obsługuje dodanie bana na użytkownika na serwerze.
+     * @param {string} guild_id - ID serwera, na którym nastąpiło dodanie bana.
+     * @param {Object} user - Pełny obiekt reprezentujący użytkownika, który zostanie zbanowany.
+     * @param {string} ban_reason - Powód zbanowania urzytkownika
+     * @returns {Promise<void>} Promise bez zwracanych danych.
+     * @throws {Error} Jeśli brakuje guild_id, user lub ban_reason.
+     */
+    async GUILD_BAN_ADD(guild_id, user, ban_reason) {
+        if (!guild_id) throw new Error("> GUILD_BAN_ADD error\n: guild id is undefind");
+        if (!user) throw new Error("> GUILD_BAN_ADD error\n: user is undefind");
+        if (!ban_reason) throw new Error("> GUILD_BAN_ADD error\n: ban reason is undefind");
+
+        let options = {
+            method: "put",
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                "Content-Type": "application/json"
+            },
+            data: {
+                reason: ban_reason || "No reason"
+            }
+        };
+        let url = `${DISCORD_API_URL}/guilds/${guild_id}/bans/${user.id}`;
+
+        try {
+            const response = await custom_request(url, options);
+            return response
+        } catch (error) {
+            console.error("An error occurred while adding ban:", error.message);
+            throw error;
+        }
+    }
+
+    /**
+     * Pobiera pełne informacje o użytkowniku.
+     * @param {string} user_id - ID użytkownika, którego dane chcesz pobrać.
+     * @returns {Promise<Object>} Obiekt reprezentujący pełne informacje o użytkowniku.
+     * @throws {Error} Jeśli brakuje user_id.
+     */
+    async getFullUserInfo(user_id) {
+        if (!user_id) throw new Error("User ID is undefined");
+
+        let options = {
+            method: "get",
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                "Content-Type": "application/json"
+            },
+        }
+
+        let url = `${DISCORD_API_URL}/users/${user_id}`;
+
+
+        try {
+            const response = await custom_request(url, options);
+            return response.data;
+        } catch (error) {
+            console.error("An error occurred while getting user info:", error.message);
+            throw error;
+        }
+    }
+
+    /**
+ * Obsługuje usunięcie bana na użytkowniku na serwerze.
+ * @param {string} guild_id - ID serwera, na którym nastąpiło usunięcie bana.
+ * @param {Object} user - Pełny obiekt reprezentujący użytkownika, który zostanie zbanowany.
+ * @returns {Promise<void>} Promise bez zwracanych danych.
+ * @throws {Error} Jeśli brakuje guild_id lub user_id.
+ */
+    async GUILD_BAN_REMOVE(guild_id, user) {
+        if (!guild_id) throw new Error("> GUILD_BAN_REMOVE error\n: guild id is undefind");
+        if (!user) throw new Error("> GUILD_BAN_REMOVE error\n: user id is undefind");
+
+        let options = {
+            method: "delete",
+            headers: {
+                Authorization: `Bot ${this.token}`
+            }
+        };
+        let url = `${DISCORD_API_URL}/guilds/${guild_id}/bans/${user.id}`;
+
+        try {
+            const response = await custom_request(url, options);
+            return response.data
+        } catch (error) {
+            console.error("An error occurred while removing ban:", error.message);
+            throw error;
+        }
+    }
+
+    /**
+ * Obsługuje tworzenie nowej roli na serwerze.
+ * @param {string} guild_id - ID serwera, na którym ma być stworzona nowa rola.
+ * @param {Object} role_data - Dane nowej roli, takie jak nazwa, kolor itp.
+ * @returns {Promise<Object>} Obiekt reprezentujący nowo utworzoną rolę.
+ * @throws {Error} Jeśli brakuje guild_id lub role_data.
+ */
+    async GUILD_ROLE_CREATE(guild_id, role_data) {
+        if (!guild_id) throw new Error("> GUILD_ROLE_CREATE error\n: guild id is undefind");
+        if (!role_data) throw new Error("> GUILD_ROLE_CREATE error\n: role data is undefind");
+
+        let options = {
+            method: "post",
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                "Content-Type": "application/json"
+            },
+            data: role_data
+        };
+        let url = `${DISCORD_API_URL}/guilds/${guild_id}/roles`;
+
+        try {
+            const response = await custom_request(url, options);
+            return response.data;
+        } catch (error) {
+            console.error("An error occurred while creating role:", error.message);
+            throw error;
+        }
+    }
+
+    /**
+ * Obsługuje aktualizację istniejącej roli na serwerze.
+ * @param {string} guild_id - ID serwera, na którym ma być zaktualizowana rola.
+ * @param {string} role_id - ID roli, która ma być zaktualizowana.
+ * @param {Object} updated_data - Zaktualizowane dane roli, np. nazwa, kolor itp.
+ * @returns {Promise<Object>} Obiekt reprezentujący zaktualizowaną rolę.
+ * @throws {Error} Jeśli brakuje guild_id, role_id lub updated_data.
+ */
+    async GUILD_ROLE_UPDATE(guild_id, role_id, updated_data) {
+        if (!guild_id) throw new Error("> GUILD_ROLE_UPDATE error\n: guild id is undefind");
+        if (!role_id) throw new Error("> GUILD_ROLE_UPDATE error\n: role id is undefind");
+        if (!updated_data) throw new Error("> GUILD_ROLE_UPDATE error\n: updated data is undefind");
+
+        let options = {
+            method: "patch",
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                "Content-Type": "application/json"
+            },
+            data: updated_data
+        };
+        let url = `${DISCORD_API_URL}/guilds/${guild_id}/roles/${role_id}`;
+
+        try {
+            const response = await custom_request(url, options);
+            return response.data;
+        } catch (error) {
+            console.error("An error occurred while updating role:", error.message);
+            throw error;
+        }
+    }
+
+    /**
+ * Obsługuje usunięcie istniejącej roli na serwerze.
+ * @param {string} guild_id - ID serwera, na którym ma być usunięta rola.
+ * @param {string} role_id - ID roli, która ma być usunięta.
+ * @returns {Promise<void>} Promise bez zwracanych danych.
+ * @throws {Error} Jeśli brakuje guild_id lub role_id.
+ */
+    async GUILD_ROLE_DELETE(guild_id, role_id) {
+        if (!guild_id) throw new Error("> GUILD_ROLE_DELETE error\n: guild id is undefind");
+        if (!role_id) throw new Error("> GUILD_ROLE_DELETE error\n: role id is undefind");
+
+        let options = {
+            method: "delete",
+            headers: {
+                Authorization: `Bot ${this.token}`
+            }
+        };
+        let url = `${DISCORD_API_URL}/guilds/${guild_id}/roles/${role_id}`;
+
+        try {
+            const response = await custom_request(url, options);
+            return response.data;
+        } catch (error) {
+            console.error("An error occurred while deleting role:", error.message);
+            throw error;
+        }
+    }
+
+    /**
+ * Obsługuje usunięcie istniejącego zaproszenia na serwerze.
+ * @param {string} invite_code - Kod zaproszenia, które ma zostać usunięte.
+ * @returns {Promise<void>} Promise bez zwracanych danych.
+ * @throws {Error} Jeśli brakuje invite_code.
+ */
+    async INVITE_DELETE(invite_code) {
+        if (!invite_code) throw new Error("> INVITE_DELETE error\n: invite code is undefind");
+
+        let options = {
+            method: "delete",
+            headers: {
+                Authorization: `Bot ${this.token}`
+            }
+        };
+        let url = `${DISCORD_API_URL}/invites/${invite_code}`;
+
+        try {
+            const response = await custom_request(url, options);
+            return response
+        } catch (error) {
+            console.error("An error occurred while deleting invite:", error.message);
+            throw error;
+        }
+    }
+
+    /**
+ * Obsługuje tworzenie nowego zaproszenia na serwerze.
+ * @param {string} channel_id - ID kanału, na którym ma być utworzone zaproszenie.
+ * @param {number} max_uses - Maksymalna ilość użyć zaproszenia (opcjonalne).
+ * @param {number} max_age - Maksymalny czas ważności zaproszenia w sekundach (opcjonalne).
+ * @returns {Promise<Object>} Obiekt reprezentujący nowe zaproszenie.
+ * @throws {Error} Jeśli brakuje channel_id.
+ */
+    async INVITE_CREATE(channel_id, max_uses = 0, max_age = 0) {
+        if (!channel_id) throw new Error("> INVITE_CREATE error\n: channel id is undefind");
+
+        let options = {
+            method: "post",
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                "Content-Type": "application/json"
+            },
+            data: {
+                max_uses: max_uses,
+                max_age: max_age
+            }
+        };
+        let url = `${DISCORD_API_URL}/channels/${channel_id}/invites`;
+
+        try {
+            const response = await custom_request(url, options);
+            return response.data;
+        } catch (error) {
+            console.error("An error occurred while creating invite:", error.message);
+            throw error;
+        }
+    }
+
+    /**
+ * Obsługuje tworzenie nowego kanału na serwerze.
+ * @param {string} guild_id - ID serwera, na którym ma być utworzony kanał.
+ * @param {Object} channel_data - Dane nowego kanału, takie jak nazwa, typ itp.
+ * @returns {Promise<Object>} Obiekt reprezentujący nowo utworzony kanał.
+ * @throws {Error} Jeśli brakuje guild_id lub channel_data.
+ */
+    async CHANNEL_CREATE(guild_id, channel_data) {
+        if (!guild_id) throw new Error("> CHANNEL_CREATE error\n: guild id is undefind");
+        if (!channel_data) throw new Error("> CHANNEL_CREATE error\n: channel data is undefind");
+
+        let options = {
+            method: "post",
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                "Content-Type": "application/json"
+            },
+            data: channel_data
+        };
+        let url = `${DISCORD_API_URL}/guilds/${guild_id}/channels`;
+
+        try {
+            const response = await custom_request(url, options);
+            return response.data;
+        } catch (error) {
+            console.error("An error occurred while creating channel:", error.message);
+            throw error;
+        }
+    }
+
+    /**
+ * Obsługuje aktualizację istniejącego kanału na serwerze.
+ * @param {string} channel_id - ID kanału, który ma być zaktualizowany.
+ * @param {Object} updated_data - Zaktualizowane dane kanału, np. nazwa, pozycja itp.
+ * @returns {Promise<Object>} Obiekt reprezentujący zaktualizowany kanał.
+ * @throws {Error} Jeśli brakuje channel_id lub updated_data.
+ */
+    async CHANNEL_UPDATE(channel_id, updated_data) {
+        if (!channel_id) throw new Error("> CHANNEL_UPDATE error\n: channel id is undefind");
+        if (!updated_data) throw new Error("> CHANNEL_UPDATE error\n: updated data is undefind");
+
+        let options = {
+            method: "patch",
+            headers: {
+                Authorization: `Bot ${this.token}`,
+                "Content-Type": "application/json"
+            },
+            data: updated_data
+        };
+        let url = `${DISCORD_API_URL}/channels/${channel_id}`;
+
+        try {
+            const response = await custom_request(url, options);
+            return response.data;
+        } catch (error) {
+            console.error("An error occurred while updating channel:", error.message);
+            throw error;
+        }
+    }
+
+    /**
+ * Obsługuje usunięcie istniejącego kanału na serwerze.
+ * @param {string} channel_id - ID kanału, który ma być usunięty.
+ * @returns {Promise<void>} Promise bez zwracanych danych.
+ * @throws {Error} Jeśli brakuje channel_id.
+ */
+    async CHANNEL_DELETE(channel_id) {
+        if (!channel_id) throw new Error("> CHANNEL_DELETE error\n: channel id is undefind");
+
+        let options = {
+            method: "delete",
+            headers: {
+                Authorization: `Bot ${this.token}`
+            }
+        };
+        let url = `${DISCORD_API_URL}/channels/${channel_id}`;
+
+        try {
+            const response = await custom_request(url, options);
+            return response.data;
+        } catch (error) {
+            console.error("An error occurred while deleting channel:", error.message);
+            throw error;
+        }
+    }
+
+    // Funkcja do wysyłania odpowiedzi na interakcję
+    async interaction_reply(interaction, user_content) {
+        // Tworzenie odpowiedzi
+        // Tworzenie odpowiedzi
+        const response = {
+            type: 4, // Typ 4 oznacza odpowiedź na komendę slash
+            data: {
+                content: "test"
+            }
+        };
+        /*
+        TODO: przsyłanie embedów w odp (przypisanie danych do zmiennych w data. np content: embed.content...)
+        TODO: opisy z @param itd
+        */
+
+        // Nagłówki
+        const headers = {
+            Authorization: `Bot ${this.token}`,
+            "Content-Type": "application/json"
+        };
+
+        // Wysłanie odpowiedzi do Discord API
+        try {
+            const responseEndpoint = `${DISCORD_API_URL}/interactions/${interaction.id}/${interaction.token}/callback`;
+            await axios.post(responseEndpoint, response, { headers });
+        } catch (error) {
+            console.error('Error sending response:', error.message);
+            if (error.response) {
+                console.error('Response data:', error.response.data);
+            }
+        }
+    }
 
     async getGateway() {
         const response = await axios.get(`${DISCORD_API_URL}/gateway/bot`, {

@@ -51,14 +51,17 @@ async function RequestManager(obj) {
         return response;
 
     } catch (err) {
-        if (err.response && err.response.status === 405) {
-            queue.shift();
-            console.log("Request failed with status code 405 -- Method Not Allowed")
-        } else if(err.response && err.response.status === 429) {
-            console.log("Request failed with status code 429 -- Rate Limit\n to many requests")
-        }
-        console.log("APILimiter error: " + err)
+    if (err.response && err.response.status === 405) {
+        queue.shift();
+        console.log("Request failed with status code 405 -- Method Not Allowed")
+    } else if (err.response && err.response.status === 429) {
+        console.log("Request failed with status code 429 -- Rate Limit\n to many requests")
     }
+
+    // Dodawanie informacji o miejscu, w którym błąd wystąpił
+    console.log("APILimiter error: " + err);
+    console.error("Error stack:", err.stack); // To wyświetli pełny stos błędów
+}
 }
 
 async function sendApi(token, url, data, options) {

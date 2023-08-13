@@ -2,7 +2,7 @@ zrobić kolorki do embedów jak w discord.js
 
 # todo
 1. spróbować zrobić wbudowany system db
-
+2. dodać opcję configu clienta: (intents)
 
 kopia z dc.js:
 
