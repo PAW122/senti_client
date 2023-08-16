@@ -766,16 +766,28 @@ class SentiClient extends EventEmitter {
         }
     }
 
-    // Funkcja do wysyłania odpowiedzi na interakcję
+    /**
+     * Funkcja do wysyłania odpowiedzi na interakcję
+     * @param {object} interaction  - interaction on what u like to response
+     * @param {message} user_content - message
+     * @returns {Promise<void>} - Discord api response
+     */
     async interaction_reply(interaction, user_content) {
-        // Tworzenie odpowiedzi
-        // Tworzenie odpowiedzi
-        const response = {
-            type: 4, // Typ 4 oznacza odpowiedź na komendę slash
-            data: {
-                content: "test"
-            }
-        };
+
+        let response = user_content
+
+        if (!user_content.type) {
+
+            response = {
+                type: 4, // Typ 4 oznacza odpowiedź na komendę slash
+                data: {
+                    content: `${user_content}`
+                }
+            };
+        } else {
+            return console.log("Nie obsługujemy jeszcze odpowiadania nainterakcje za pomocą wiadomości embed. ta funkcjazostanie dodana wprzyszłości")
+        }
+
         /*
         TODO: przsyłanie embedów w odp (przypisanie danych do zmiennych w data. np content: embed.content...)
         TODO: opisy z @param itd
@@ -790,11 +802,13 @@ class SentiClient extends EventEmitter {
         // Wysłanie odpowiedzi do Discord API
         try {
             const responseEndpoint = `${DISCORD_API_URL}/interactions/${interaction.id}/${interaction.token}/callback`;
-            await axios.post(responseEndpoint, response, { headers });
+            console.log("wiodhawofhjaw----------------------------------------------------\n", response)
+            return await axios.post(responseEndpoint, response, { headers });
         } catch (error) {
             console.error('Error sending response:', error.message);
             if (error.response) {
                 console.error('Response data:', error.response.data);
+                return error.response.data
             }
         }
     }

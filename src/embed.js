@@ -1,6 +1,24 @@
+/**
+ * EmbedMessage
+ * @function setType - set type of message
+ * @function setTitle - set title
+ * @function setDescription - set description
+ * @function setUrl - add url
+ * @function setColor - set bar color
+ * @function addFields - add multiple fields
+ * @function setFooter - set fotter
+ * @function setImage - add image
+ * @function setThumbnail - set thumbnail
+ * @function setVideo - add video
+ * @function setProvider - set provider
+ * @function setTimestamp - set timesamp (date)
+ * @function setAuthor - set author
+ * @function getEmbed - get formated json embed message (needed to send to discord)
+ */
 class EmbedMessage {
     constructor() {
         this.embed = {
+            type: "rich",
             title: "",
             description: "",
             url: "",
@@ -16,31 +34,74 @@ class EmbedMessage {
         };
     }
 
+    /**
+     * type of message
+     * @param {string / number} type
+     * @returns {object} - return object
+     */
+    setType(type) {
+        this.type = type;
+        return this;
+    }
+
+    /**
+     * 
+     * @param {string} title - String contains title off embed message 
+     * @returns {object}
+     */
     setTitle(title) {
         this.embed.title = title;
         return this;
     }
 
+    /**
+     * 
+     * @param {string} description - description off embed message 
+     * @returns {object}
+     */
     setDescription(description) {
         this.embed.description = description;
         return this;
     }
 
+    /**
+     * add url to embed
+     * @param {string} url 
+     * @returns {object}
+     */
     setUrl(url) {
         this.embed.url = url
         return this
     }
 
+    /**
+     * set a color for bar on left side of message
+     * @param {color} color - color value
+     * @returns 
+     */
     setColor(color) {
         this.embed.color = color;
         return this;
     }
 
-    addField(name, value, inline = false) {
+    /**
+     * 
+     * @param {string} name - field title 
+     * @param {string} value - field discription
+     * @param {boolean} inline - inline to last field?
+     * @returns 
+     */
+    addFields(name, value, inline = false) {
         this.embed.fields.push({ name, value, inline });
         return this;
     }
 
+    /**
+     * 
+     * @param {string} text - text  
+     * @param {string} iconUrl - icon for example user avatar
+     * @returns 
+     */
     setFooter(text, iconUrl) {
         this.embed.footer = {
             text: text || null,
@@ -102,6 +163,10 @@ class EmbedMessage {
         return this
     }
 
+    /**
+     * return embed object us json thats ready to use and send to discord
+     * @returns {JSON} - formated json embed message
+     */
     getEmbed() {
         const embed = { ...this.embed };
         // Remove any null or empty properties from the embed object

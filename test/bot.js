@@ -167,10 +167,11 @@ async function main() {
         const reason = 'Sample response';
         const embed_worker = new EmbedMessage()
             .setTitle('**8ball**')
+            .setDescription("test")
             .setColor('RANDOM')
             .setDescription(`${reason}`);
 
-        senti.interaction_reply(interaction,embed_worker)
+        senti.interaction_reply(interaction,embed_worker.getEmbed())
         // Tutaj obsługuj wywołanie slash command "blep"
         // Możesz użyć interaction.reply() aby wysłać odpowiedź do użytkownika
       }
