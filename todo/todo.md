@@ -1,5 +1,12 @@
 zrobić kolorki do embedów jak w discord.js
 
+# teraz:
+spróbować usunąć wiadomości duchy z logów (if !messge.content return)
+zrobić voice
+
+jak zrobić api limiter:
+zrobić to nie asynchroniczne
+
 # todo
 1. spróbować zrobić wbudowany system db
 2. rozwinąć komendy np "channel_delete" z test/commands na normalne komendy
@@ -8,10 +15,35 @@ zrobić kolorki do embedów jak w discord.js
 5. dodać opisy @param... do syfu typu: senti.INVITE_CREATE
 6. usunąć usles logi
 7. dodać opcję tts do wiadomości
+8. dodać do readme ilość pobrań
+9. przetestować deleteAllSlashCommands i deleteSlashCommand w main.js!
+
+10. error system: client.on("error") , client.on("warring)
+11. wysyłanie interakcji bez odpowiadania na oryginalną
+12. odpowiadanie na wiadomość (zwykła wiadomość)
+13. wywyłanie wiadomości na pv
+14. do przetestowania wszystko z eventsHandler !! - tylko kilka jest przetestowane
+15. tutoriale na yt jak zrobić bota
+16. prosta dokumentacja w readme
+18. sprawdzić czy to działa, jeżeli nie to zrobić funkcje żeby działało: message.mentions.members.first() || message.guild.members.cache.get(args[0])
+19. dodać możliwość wywyłania kilku embedów w 1 wiadomości: (jeżeli przekazana zostanie lista(array) to embeds: [<input>] ma być zamienione na embeds: <input>)
+
+# !! zrobic publiczną wersję senti_client na githubie
+# !! i podlinkować w readme żeby na npm było widać,
+# !! w npm dodać link do zgłaszania błędów
+# !! zrobić jakąś opcję zgłąszania chęci współpracy
 
 # kiedyś:
-zamienić axiosa na featch żeby user nie musiał pobierać dodatkowych bibliotek
+1. zamienić axiosa na featch żeby user nie musiał pobierać dodatkowych bibliotek
+2. PROGRAM WSPIERAJĄCYCH -- załośyć zbiórkę np na partonite czy czymś żeby zbierać hajs na stworzenie strony interetowej, wsparcie twórcy, dalszy rozwój, jak kiedyś powstanie strona to dodawać tam listę osób które wspierają, wspierający np mogą dostawać dostęp do wersji Beta updatów (dostęp do wersji produkcyjnej (bez opcji edytowania))
+3. podczas włączania bota dodać log w konsoli: "Thank you for using senti_client: <link>"
 
+# strona senti client.com
+zorbić stronę z:
+1. podstrona dla wspierających
+2. głosowanie co nowego dodać
+3. zgłoszenia błędów
+4. dokumentacja
 
 kopia z dc.js:
 

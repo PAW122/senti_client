@@ -1,5 +1,10 @@
 const axios = require("axios")
-
+/**
+ * send all requests from one place
+ * @param {string} url 
+ * @param {JSON} options 
+ * @returns 
+ */
 async function custom_request(url, options) {
     try {
         return await axios(url, options)

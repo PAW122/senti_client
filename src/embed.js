@@ -110,6 +110,14 @@ class EmbedMessage {
         return this;
     }
 
+    /**
+     * add Image
+     * @param {string} url - link 
+     * @param {string} proxyUrl - proxy link
+     * @param {number} height - height
+     * @param {number} width - width
+     * @returns 
+     */
     setImage(url, proxyUrl, height, width) {
         this.embed.image = {
             url: url,
@@ -120,6 +128,14 @@ class EmbedMessage {
         return this;
     }
 
+    /**
+     * add Thumbnail
+     * @param {string} url - link 
+     * @param {string} proxyUrl - proxy link
+     * @param {number} height - height
+     * @param {number} width - width
+     * @returns 
+     */
     setThumbnail(url, proxyUrl, height, width) {
         this.embed.thumbnail = {
             url: url,
@@ -129,7 +145,15 @@ class EmbedMessage {
         };
         return this;
     }
-
+    
+    /**
+     * add Video
+     * @param {string} url - link 
+     * @param {string} proxyUrl - proxy link
+     * @param {number} height - height
+     * @param {number} width - width
+     * @returns 
+     */
     setVideo(url, proxyUrl, height, width) {
         this.embed.video = {
             url: url,
@@ -140,6 +164,12 @@ class EmbedMessage {
         return this;
     }
 
+    /**
+     * add Provider
+     * @param {string} name 
+     * @param {string} url 
+     * @returns 
+     */
     setProvider(name,url) {
         this.embed.provider = {
             name: name,
@@ -148,11 +178,24 @@ class EmbedMessage {
         return this
     }
 
+    /**
+     * add Timesamp
+     * @param {timestamp} timestamp - date
+     * @returns 
+     */
     setTimestamp(timestamp) {
         this.embed.timestamp = timestamp;
         return this;
     }
 
+    /**
+     * add author data
+     * @param {string} name 
+     * @param {string} url 
+     * @param {string} icon_url 
+     * @param {string} proxy_icon_url 
+     * @returns 
+     */
     setAuthor(name,url,icon_url,proxy_icon_url) {
         this.embed.author = {
             name: name,

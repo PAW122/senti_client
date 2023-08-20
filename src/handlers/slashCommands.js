@@ -2,6 +2,9 @@ const { DISCORD_API_URL } = require("../config/config.json")
 const axios = require("axios")
 const slashCollection = require("../modules/slahsColection")
 
+/**
+ * easy way to register slash command
+ */
 class SlashCommandManager {
     constructor(token) {
         this.token = token;
@@ -9,7 +12,12 @@ class SlashCommandManager {
         global.slashCollection = this.slash_Collection;
     }
 
-    //TODO: po wywołaniu automatycznie dodawaj nazwe komendy do listy senti.slashcommands
+    /**
+     * register new command
+     * @param {JSON} commandData 
+     * @param {string} client_id 
+     * @returns {response} - res.data
+     */
     async registerSlashCommand(commandData, client_id) {
         const url = `${DISCORD_API_URL}/applications/${client_id}/commands`;
 
@@ -30,6 +38,10 @@ class SlashCommandManager {
             throw error;
         }
     }
+    /**
+     * executed when new command is register succesfully
+     * @param {response} interactionData 
+     */
     async executeInteraction(interactionData) {
     
     }

@@ -809,7 +809,6 @@ class SentiClient extends EventEmitter {
         // Wysłanie odpowiedzi do Discord API
         try {
             const responseEndpoint = `${DISCORD_API_URL}/interactions/${interaction.id}/${interaction.token}/callback`;
-            console.log("------------------my-res----------------------------------\n", response)
             return await axios.post(responseEndpoint, response, { headers });
         } catch (error) {
             console.error('Error sending response:', error.message);
@@ -851,8 +850,6 @@ class SentiClient extends EventEmitter {
             });
 
             var messageIds = response.data.map(message => message.id);
-            console.log("messages ----------------------------------------------------------------------------------------")
-            console.log(messageIds)
 
             if(messageIds < 2) {
                 console.error(messageIds)
@@ -862,6 +859,67 @@ class SentiClient extends EventEmitter {
 
         } catch (error) {
             console.error('Błąd', error.message);
+        }
+    }
+
+    /**
+     * allows you to remove the registered command slash
+     * @param {id} commandId
+     * 
+     * after registering a slash command, it is assigned to the bot and is displayed 
+     * in the menu after typing / on discord. If the bot stops supporting the command, 
+     * e.g. "ping", it will be displayed for some time. deleteSlashCommand can be used to prevent this
+     * 
+     * !! warning !!
+     *  both commands are not tested
+     */
+    async deleteSlashCommand(senti, commandId) {
+        const CLIENT_ID = senti.user.id
+        const url = `${DISCORD_API_URL}/applications/${CLIENT_ID}/commands/${commandId}`;
+    
+        try {
+            const response = await axios.delete(url, {
+                headers: {
+                    Authorization: `Bot ${BOT_TOKEN}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            console.log("Slash command deleted:", response.data);
+        } catch (error) {
+            console.error('An error occurred while deleting slash command:', error.message);
+            throw error;
+        }
+    }
+
+    /**
+     * works the same as deleteSlash Command, but removes all registered slash commands assigned to the bot
+     */
+    async deleteAllSlashCommands(senti) {
+        const CLIENT_ID = senti.user.id
+        const url = `${DISCORD_API_URL}/applications/${CLIENT_ID}/commands`;
+    
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    Authorization: `Bot ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            const commands = response.data;
+            for (const command of commands) {
+                await axios.delete(`${url}/${command.id}`, {
+                    headers: {
+                        Authorization: `Bot ${this.token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                console.log(`Deleted command with ID ${command.id}`);
+            }
+        } catch (error) {
+            console.error('An error occurred while deleting all slash commands:', error.message);
+            throw error;
         }
     }
 

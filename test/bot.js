@@ -3,6 +3,9 @@ const { SentiClient, SlashCommandManager } = require("senti_client");
 const handler = require("./handlers/handler")
 const msg_handler = require("./handlers/msg_handler")
 
+// (/) commands
+const slashCommandsHandler = require("./handlers/slashCommandHandler")
+
 const eventsHandler = require("./handlers/eventsHandler")
 
 async function main() {
@@ -18,20 +21,17 @@ async function main() {
 
   senti.once("ready", (client) => {
     console.log(client.user.username + " is ready")
-
-    require("./slashCommands/slash_command")(commandManager, client)
-
-  })
+    slashCommandsHandler(commandManager, senti)
+  });
 
   handler(senti)
 
   senti.on("messageCreate", (message, obj) => {
-    console.log(message.content)
+    console.log(message.content);
 
-    msg_handler(message, senti, prefix)
+    msg_handler(message, senti, prefix);
     // console.log(obj)
-
-  })
+  });
 
   senti.on('INTERACTION_CREATE', async (interaction) => {
     const mySlashCollection = global.slashCollection

@@ -1,6 +1,14 @@
 const { DISCORD_API_URL } = require("../../config/config.json")
 const sendApi = require("../../modules/APILimiter")
 
+/**
+ * send message (put)
+ * @param {token} token - bot token
+ * @param {string} channelId - channel id
+ * @param {string} message - message content
+ * @param {emoji} reaction - optional
+ * @returns {response} - discord API response
+ */
 async function send(token, channelId, message, reaction) {
     const url = `${DISCORD_API_URL}/channels/${channelId}/messages`;
 
