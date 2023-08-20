@@ -1,47 +1,20 @@
-zrobić kolorki do embedów jak w discord.js
+# Senti Client
 
-# todo
-1. spróbować zrobić wbudowany system db
-2. dodać opcję configu clienta: (intents)
+![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Version](https://img.shields.io/badge/version-0.0.9-brightgreen.svg)
+![npm Downloads](https://img.shields.io/npm/dt/senti-client.svg)
 
-kopia z dc.js:
+Senti Client is a JavaScript library that provides a simple and intuitive way to interact with the Senti API.
 
+## Features
 
-export interface ConstantsColors {
-  DEFAULT: 0x000000;
-  WHITE: 0xffffff;
-  AQUA: 0x1abc9c;
-  GREEN: 0x57f287;
-  BLUE: 0x3498db;
-  YELLOW: 0xfee75c;
-  PURPLE: 0x9b59b6;
-  LUMINOUS_VIVID_PINK: 0xe91e63;
-  FUCHSIA: 0xeb459e;
-  GOLD: 0xf1c40f;
-  ORANGE: 0xe67e22;
-  RED: 0xed4245;
-  GREY: 0x95a5a6;
-  NAVY: 0x34495e;
-  DARK_AQUA: 0x11806a;
-  DARK_GREEN: 0x1f8b4c;
-  DARK_BLUE: 0x206694;
-  DARK_PURPLE: 0x71368a;
-  DARK_VIVID_PINK: 0xad1457;
-  DARK_GOLD: 0xc27c0e;
-  DARK_ORANGE: 0xa84300;
-  DARK_RED: 0x992d22;
-  DARK_GREY: 0x979c9f;
-  DARKER_GREY: 0x7f8c8d;
-  LIGHT_GREY: 0xbcc0c0;
-  DARK_NAVY: 0x2c3e50;
-  BLURPLE: 0x5865f2;
-  GREYPLE: 0x99aab5;
-  DARK_BUT_NOT_BLACK: 0x2c2f33;
-  NOT_QUITE_BLACK: 0x23272a;
-}
+- Easy-to-use interface for interacting with the Senti API.
+- Simplified methods for sending and receiving data.
+- Enhanced error handling and response parsing.
 
-dodać jakieś proste sprawdzanie czy poprawne dane były wprowadzone
+## Installation
 
-wszystkei opdje Embeda do przetestowania
+You can install the Senti Client library using npm:
 
-dodać token w .env żeby nie było tokena na githubie
+```bash
+npm install senti-client
