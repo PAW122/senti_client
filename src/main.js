@@ -16,6 +16,8 @@ class SentiClient extends EventEmitter {
         this.connected = false;
         this.token = null;
         this.commands = new Collection();
+        this.slashCommands = new Collection();
+        this.intents = 513//deafult
 
         //emit events
         this.eventHandlers = eventHandlers;
@@ -35,8 +37,11 @@ class SentiClient extends EventEmitter {
      * @returns {event} - return information in "ready" event.
      * @throws {Error} - Return error if needed
     */
-    async connect(token) {
+    async connect(token, options) {
         if (!token) throw new Error("connect error:\n token is undefind")
+        if(options && options.intents) {
+            this.intents = options.intents
+        }
         if (!this.connected) {
             this.token = token;
             const response = await axios.get(`${DISCORD_API_URL}/users/@me`, {
@@ -137,7 +142,7 @@ class SentiClient extends EventEmitter {
                         op: 2,
                         d: {
                             token: this.token,
-                            intents: 513,
+                            intents: this.intents,
                             properties: {
                                 $os: "linux",
                                 $browser: "senti_client",
@@ -268,6 +273,7 @@ class SentiClient extends EventEmitter {
     */
     async MESSAGE_DELETE_BULK(channel_id, message_ids) {
         if (!channel_id) throw new Error("> MESSAGE_DELETE_BULK error\n: channel id is undefind");
+        console.log(message_ids)
         if (!message_ids || message_ids.length === 0) throw new Error("> MESSAGE_DELETE_BULK error\n: message ids are missing");
         // TODO: przenieść do APILimiter
         let options = {
@@ -284,6 +290,7 @@ class SentiClient extends EventEmitter {
 
         try {
             const response = await custom_request(url, options);
+            console.log(response)
             return response.data;
         } catch (error) {
             console.error("An error occurred while deleting messages:", error.message);
@@ -768,8 +775,8 @@ class SentiClient extends EventEmitter {
 
     /**
      * Funkcja do wysyłania odpowiedzi na interakcję
-     * @param {object} interaction  - interaction on what u like to response
-     * @param {message} user_content - message
+     * @param {object} interaction  - the interaction you want to respond to
+     * @param {message} user_content - message / embed
      * @returns {Promise<void>} - Discord api response
      */
     async interaction_reply(interaction, user_content) {
@@ -785,15 +792,15 @@ class SentiClient extends EventEmitter {
                 }
             };
         } else {
-            return console.log("Nie obsługujemy jeszcze odpowiadania nainterakcje za pomocą wiadomości embed. ta funkcjazostanie dodana wprzyszłości")
+            //Embed response
+            response = {
+                type: 4,
+                data: {
+                    embeds: [user_content]
+                }
+            }
         }
 
-        /*
-        TODO: przsyłanie embedów w odp (przypisanie danych do zmiennych w data. np content: embed.content...)
-        TODO: opisy z @param itd
-        */
-
-        // Nagłówki
         const headers = {
             Authorization: `Bot ${this.token}`,
             "Content-Type": "application/json"
@@ -802,7 +809,7 @@ class SentiClient extends EventEmitter {
         // Wysłanie odpowiedzi do Discord API
         try {
             const responseEndpoint = `${DISCORD_API_URL}/interactions/${interaction.id}/${interaction.token}/callback`;
-            console.log("wiodhawofhjaw----------------------------------------------------\n", response)
+            console.log("------------------my-res----------------------------------\n", response)
             return await axios.post(responseEndpoint, response, { headers });
         } catch (error) {
             console.error('Error sending response:', error.message);
@@ -810,6 +817,51 @@ class SentiClient extends EventEmitter {
                 console.error('Response data:', error.response.data);
                 return error.response.data
             }
+        }
+    }
+
+    /**
+     * Delete 1 - 100 last messages on channel
+     * @param {number} channelId - channel id 
+     * @param {number} count - number > 1 and < 100
+     */
+    async get_messages(channelId, count) {
+        count = parseInt(count)
+
+        if (!count) {
+            throw new Error("'count' should be a number equal or lower then 100 and higher then 1")
+        }
+
+        if(count > 100) throw new Error("count is to hight")
+        else if(count < 1) throw new Error("count is to low")
+
+        if (!channelId) throw new Error("channelId is undefind")
+
+
+        try {
+            const endpoint = `${DISCORD_API_URL}/channels/${channelId}/messages`;
+
+            const response = await axios.get(endpoint, {
+                headers: {
+                    Authorization: `Bot ${this.token}`,
+                },
+                params: {
+                    limit: count,
+                },
+            });
+
+            var messageIds = response.data.map(message => message.id);
+            console.log("messages ----------------------------------------------------------------------------------------")
+            console.log(messageIds)
+
+            if(messageIds < 2) {
+                console.error(messageIds)
+            } else {
+                return messageIds
+            }
+
+        } catch (error) {
+            console.error('Błąd', error.message);
         }
     }
 

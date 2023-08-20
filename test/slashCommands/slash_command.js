@@ -1,5 +1,3 @@
-const { EmbedMessage } = require("senti_client")
-
 module.exports = (commandManager, senti) => {
     const commandData = {
         name: 'blep',
@@ -9,7 +7,7 @@ module.exports = (commandManager, senti) => {
             {
                 name: 'animal',
                 description: 'The type of animal',
-                type: 3, // This is a String type option
+                type: 3, //String type option
                 required: true,
                 choices: [
                     {
@@ -42,15 +40,4 @@ module.exports = (commandManager, senti) => {
         .catch(error => {
             console.error('Error registering slash command:', error.response.data);
         });
-
-    // W obszarze, gdzie odbierasz interakcje z Discord API
-
-    commandManager.executeInteraction(async (inter) => {
-        const reason = 'Sample response';
-        const embed_worker = new new EmbedMessage()
-            .setTitle('**8ball**')
-            .setColor('RANDOM')
-            .setDescription(`${reason}`);
-        inter.reply({ embeds: [embed_worker] });
-    });
 }
