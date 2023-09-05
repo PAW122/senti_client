@@ -8,7 +8,7 @@ jak zrobić api limiter:
 zrobić to nie asynchroniczne
 
 # todo
-1. spróbować zrobić wbudowany system db
+1. spróbować zrobić wbudowany system db albo handler do jakiejś db online
 2. rozwinąć komendy np "channel_delete" z test/commands na normalne komendy
 3. zrobić system helpa do komend
 4. przetestować wszystkie komendy
@@ -27,6 +27,9 @@ zrobić to nie asynchroniczne
 16. prosta dokumentacja w readme
 18. sprawdzić czy to działa, jeżeli nie to zrobić funkcje żeby działało: message.mentions.members.first() || message.guild.members.cache.get(args[0])
 19. dodać możliwość wywyłania kilku embedów w 1 wiadomości: (jeżeli przekazana zostanie lista(array) to embeds: [<input>] ma być zamienione na embeds: <input>)
+20. system uprawnień: const { Permissions: { FLAGS } } = require('discord.js'); , message.member.permissions.has(FLAGS.ADMINISTRATOR) -- sprawdzić jak to aktualnie działa, ewentualnie zrobić coś od 0
+21. system voice: @discordjs/voice❌
+22. sytem dodawania pliku do wiadomości po jego lokalizacji na dysku: new Discord.MessageAttachment(`commands/komendy/game_flags/flags/${rng}.png`) \ może jeszcze dodawanie pliku po linku
 
 # !! zrobic publiczną wersję senti_client na githubie
 # !! i podlinkować w readme żeby na npm było widać,
@@ -45,9 +48,38 @@ zorbić stronę z:
 3. zgłoszenia błędów
 4. dokumentacja
 
+kopia z SEEN- : bot_client.js
+
+function getPermissionNames(bitfield) {
+    var permissionNames = [];
+    if (bitfield & 0x8n) permissionNames.push("ADMINISTRATOR");
+    if (bitfield & 0x40000n) permissionNames.push("MANAGE_GUILD");
+    if (bitfield & 0x400n) permissionNames.push("MANAGE_ROLES");
+    if (bitfield & 0x80n) permissionNames.push("MANAGE_CHANNELS");
+    if (bitfield & 0x100n) permissionNames.push("KICK_MEMBERS");
+    if (bitfield & 0x200n) permissionNames.push("BAN_MEMBERS");
+    if (bitfield & 0x400000n) permissionNames.push("CREATE_INSTANT_INVITE");
+    if (bitfield & 0x1n) permissionNames.push("VIEW_CHANNEL");
+    if (bitfield & 0x2n) permissionNames.push("SEND_MESSAGES");
+    if (bitfield & 0x4n) permissionNames.push("SEND_TTS_MESSAGES");
+    if (bitfield & 0x10n) permissionNames.push("MANAGE_MESSAGES");
+    if (bitfield & 0x20n) permissionNames.push("EMBED_LINKS");
+    if (bitfield & 0x40n) permissionNames.push("ATTACH_FILES");
+    if (bitfield & 0x800n) permissionNames.push("READ_MESSAGE_HISTORY");
+    if (bitfield & 0x1000n) permissionNames.push("MENTION_EVERYONE");
+    if (bitfield & 0x2000n) permissionNames.push("USE_EXTERNAL_EMOJIS");
+    if (bitfield & 0x8000n) permissionNames.push("ADD_REACTIONS");
+    if (bitfield & 0x20000n) permissionNames.push("CONNECT");
+    if (bitfield & 0x100000n) permissionNames.push("SPEAK");
+    if (bitfield & 0x200000n) permissionNames.push("MUTE_MEMBERS");
+    if (bitfield & 0x800000n) permissionNames.push("DEAFEN_MEMBERS");
+    if (bitfield & 0x1000000n) permissionNames.push("MOVE_MEMBERS");
+    if (bitfield & 0x4000000n) permissionNames.push("USE_VAD");
+
+    return permissionNames;
+}
+
 kopia z dc.js:
-
-
 export interface ConstantsColors {
   DEFAULT: 0x000000;
   WHITE: 0xffffff;

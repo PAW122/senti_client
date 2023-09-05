@@ -39,7 +39,7 @@ class SentiClient extends EventEmitter {
     */
     async connect(token, options) {
         if (!token) throw new Error("connect error:\n token is undefind")
-        if(options && options.intents) {
+        if (options && options.intents) {
             this.intents = options.intents
         }
         if (!this.connected) {
@@ -104,6 +104,7 @@ class SentiClient extends EventEmitter {
                     const message = data;
                     const obj = JSON.stringify(data);
                     if (!message) return
+                    // if (!message.content) return @messageCreact can emit blank messages becouse its need to emit messages with np: only file and no content 
                     this.emit('messageCreate', message, obj);
                 },
                 'MESSAGE_UPDATE': (data) => this.emit("MESSAGE_UPDATE", data),
@@ -831,8 +832,8 @@ class SentiClient extends EventEmitter {
             throw new Error("'count' should be a number equal or lower then 100 and higher then 1")
         }
 
-        if(count > 100) throw new Error("count is to hight")
-        else if(count < 1) throw new Error("count is to low")
+        if (count > 100) throw new Error("count is to hight")
+        else if (count < 1) throw new Error("count is to low")
 
         if (!channelId) throw new Error("channelId is undefind")
 
@@ -851,7 +852,7 @@ class SentiClient extends EventEmitter {
 
             var messageIds = response.data.map(message => message.id);
 
-            if(messageIds < 2) {
+            if (messageIds < 2) {
                 console.error(messageIds)
             } else {
                 return messageIds
@@ -876,7 +877,7 @@ class SentiClient extends EventEmitter {
     async deleteSlashCommand(senti, commandId) {
         const CLIENT_ID = senti.user.id
         const url = `${DISCORD_API_URL}/applications/${CLIENT_ID}/commands/${commandId}`;
-    
+
         try {
             const response = await axios.delete(url, {
                 headers: {
@@ -884,7 +885,7 @@ class SentiClient extends EventEmitter {
                     'Content-Type': 'application/json',
                 },
             });
-    
+
             console.log("Slash command deleted:", response.data);
         } catch (error) {
             console.error('An error occurred while deleting slash command:', error.message);
@@ -898,7 +899,7 @@ class SentiClient extends EventEmitter {
     async deleteAllSlashCommands(senti) {
         const CLIENT_ID = senti.user.id
         const url = `${DISCORD_API_URL}/applications/${CLIENT_ID}/commands`;
-    
+
         try {
             const response = await axios.get(url, {
                 headers: {
@@ -906,7 +907,7 @@ class SentiClient extends EventEmitter {
                     'Content-Type': 'application/json',
                 },
             });
-    
+
             const commands = response.data;
             for (const command of commands) {
                 await axios.delete(`${url}/${command.id}`, {
@@ -919,6 +920,42 @@ class SentiClient extends EventEmitter {
             }
         } catch (error) {
             console.error('An error occurred while deleting all slash commands:', error.message);
+            throw error;
+        }
+    }
+
+    async getGuild(guildId) {
+        const url = `${DISCORD_API_URL}/guilds/${guildId}`;
+    
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    Authorization: `Bot ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            return response.data;
+        } catch (error) {
+            console.error('An error occurred while getting guild information:', error.message);
+            throw error;
+        }
+    }
+
+    async getUser(userId) {
+        const url = `${DISCORD_API_URL}/users/${userId}`;
+    
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    Authorization: `Bot ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            return response.data;
+        } catch (error) {
+            console.error('An error occurred while getting user information:', error.message);
             throw error;
         }
     }
