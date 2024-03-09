@@ -1,4 +1,12 @@
+//lib local instal
+/*
+/src -> npm link
+/test -> npm link senti_client
+*/
+
+
 const { SentiClient, SlashCommandManager } = require("senti_client");
+const config = require("./config.json")
 //commands
 const handler = require("./handlers/handler")
 const msg_handler = require("./handlers/msg_handler")
@@ -9,7 +17,7 @@ const slashCommandsHandler = require("./handlers/slashCommandHandler")
 const eventsHandler = require("./handlers/eventsHandler")
 
 async function main() {
-  const bot_token = "Nzk3MDcwODA2ODg1OTkwNDMx.GMK9g0.IMdFMHuph15iJrYiH-6eM9K_y7LW984ioZYvqw";
+  const bot_token = config.token;
   const prefix = ">";
 
   const senti = new SentiClient();

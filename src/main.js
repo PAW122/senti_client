@@ -8,6 +8,7 @@ const sendWithEmbed_api = require("./handlers/send_embed")
 const addReaction_api = require("./modules/reactions")
 const req_api = require("./modules/APILimiter")
 const { custom_request } = require("./modules/ReqApi")
+const convertTypeToString = require("./handlers/type_convert")
 
 let instance = null;
 class SentiClient extends EventEmitter {
@@ -96,7 +97,12 @@ class SentiClient extends EventEmitter {
                 'INTEGRATION_UPDATE': (data) => this.emit("INTEGRATION_UPDATE", data),
                 'INTEGRATION_DELETE': (data) => this.emit("INTEGRATION_DELETE", data),
                 'INTERACTION_CREATE': (data) => {
-                    this.emit("INTERACTION_CREATE", data)
+                    const options = data.data.options.map(option => ({
+                        ...option,
+                        type: convertTypeToString(option.type)
+                    }));
+                
+                    this.emit("INTERACTION_CREATE", { ...data, options: options });
                 },
                 'INVITE_CREATE': (data) => this.emit("INVITE_CREATE", data),
                 'INVITE_DELETE': (data) => this.emit("INVITE_DELETE", data),

@@ -1,5 +1,17 @@
 zrobić kolorki do embedów jak w discord.js
 
+# (/) commands
+teraz podczas rejestracji komendy do dc jest przesyłany jej json.
+przez to dc automatycznie odpowiada na komendy (/) przez co nie można urzyć żadnej db ponieważ za odpowiedzi odpowiada discord a nie bot.
+trzeda zmienić to tak: {
+  1. jeżeli nie ma customowej odpowiedzi (interaction_execute) to dc ma sam odpowiadac na urzycie slash command
+  2. jeżeli jest customowa odpowiedz to dc nie ma dopowidać, zamiast tego ma być wykonywany kod np: {
+    const command = ???
+    command.interaction_execute(interaction_data, senti)
+  }
+  podczas rejestracji / command z customową odp prawdopodobnie najlepszym rozwiązaniem będzie podawanie takiego jsona aby nie było żadnych odpowiedzi (same dane i opcje dla usera)
+}
+
 # teraz:
 spróbować usunąć wiadomości duchy z logów (if !messge.content return)
 zrobić voice
@@ -8,6 +20,8 @@ jak zrobić api limiter:
 zrobić to nie asynchroniczne
 
 # todo
++ error handler -> jeżeli zostanie włączony podczas tworzenia clienta bota to
+nie ma wywalać bota tylko emitować error
 1. spróbować zrobić wbudowany system db albo handler do jakiejś db online
 2. rozwinąć komendy np "channel_delete" z test/commands na normalne komendy
 3. zrobić system helpa do komend

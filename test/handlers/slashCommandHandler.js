@@ -12,4 +12,5 @@ module.exports = (commandManager, senti) => {
             command(commandManager, senti)
         }
     }
+    console.log(commandManager.getCollection() , "<------ command Manager collection")
 }

@@ -13,6 +13,14 @@ class SlashCommandManager {
     }
 
     /**
+     * 
+     * @returns {Promise} - slashCollection object
+     */
+    async getCollection() {
+        return this.slash_Collection
+    }
+
+    /**
      * register new command
      * @param {JSON} commandData 
      * @param {string} client_id 
@@ -38,13 +46,35 @@ class SlashCommandManager {
             throw error;
         }
     }
+
     /**
-     * executed when new command is register succesfully
-     * @param {response} interactionData 
+     * register new command for a specific guild
+     * @param {JSON} commandData 
+     * @param {string} client_id 
+     * @param {string} guild_id 
+     * @returns {response} - res.data
      */
-    async executeInteraction(interactionData) {
-    
+    async registerGuildSlashCommand(commandData, client_id, guild_id) {
+        const url = `${DISCORD_API_URL}/applications/${client_id}/guilds/${guild_id}/commands`;
+
+        // Save new command
+        this.slash_Collection.add(commandData.name, commandData);
+
+        try {
+            const response = await axios.post(url, commandData, {
+                headers: {
+                    Authorization: `Bot ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            
+            return response.data;
+        } catch (error) {
+            console.error('An error occurred while registering guild slash command:', error.message);
+            throw error;
+        }
     }
+
 
 }
 

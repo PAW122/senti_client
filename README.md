@@ -19,3 +19,33 @@ You can install the Senti Client library using npm:
 
 ```bash
 npm install senti-client
+```
+## How to start
+
+```javascript
+const { SentiClient } = require("senti_client");
+
+// Creating a new client instance
+const senti = new SentiClient();
+
+//set bot token and command prefix
+const bot_token = "YOUR_DISCORD_BOT_TOKEN";
+const prefix = ">";
+
+let options = {
+    intents: 32767
+}
+
+//execute when bot is ready
+senti.once("ready", (client) => {
+    console.log(client.user.username + " is ready")
+});
+
+//execute when user send message
+senti.on("messageCreate", (message, obj) => {
+    console.log(message.content);
+});
+
+//connect bot to discord servers
+senti.connect(bot_token, options);
+```

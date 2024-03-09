@@ -4,7 +4,7 @@ module.exports = {
     execute: async (message, args,senti) => {
 
         senti.send(message.channel_id, "Pong!");
-    
+        
     }
 
 }
